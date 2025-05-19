@@ -1,4 +1,6 @@
 
+using BlockedCountries.Repositories;
+using BlockedCountries.Repositories.interfaces;
 using BlockedCountries.Services;
 using BlockedCountries.Services.Interfaces;
 
@@ -19,7 +21,7 @@ namespace BlockedCountries
 
             //register my services
             builder.Services.AddHttpClient<IIpGeolocationService, IpGeolocationService>();
-
+            builder.Services.AddSingleton<ICountryBlockingRepository, CountryBlockingRepository>();
 
 
 
