@@ -1,4 +1,7 @@
 
+using BlockedCountries.Services;
+using BlockedCountries.Services.Interfaces;
+
 namespace BlockedCountries
 {
     public class Program
@@ -13,7 +16,18 @@ namespace BlockedCountries
             // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
             builder.Services.AddOpenApi();
 
+
+            //register my services
+            builder.Services.AddHttpClient<IIpGeolocationService, IpGeolocationService>();
+
+
+
+
+
+
             var app = builder.Build();
+
+
 
             // Configure the HTTP request pipeline.
             if (app.Environment.IsDevelopment())
