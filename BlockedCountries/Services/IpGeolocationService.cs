@@ -1,11 +1,31 @@
 ﻿using BlockedCountries.Models;
 using BlockedCountries.Services.Interfaces;
-using System.Text.Json;
+using Newtonsoft.Json;
 
 namespace BlockedCountries.Services
 {
     public class IpGeolocationService : IIpGeolocationService
     {
+        private static readonly HashSet<string> ValidCountryCodes = new HashSet<string>
+        {
+            "AF", "AX", "AL", "DZ", "AS", "AD", "AO", "AI", "AQ", "AG", "AR", "AM", "AW", "AU", "AT", "AZ",
+            "BS", "BH", "BD", "BB", "BY", "BE", "BZ", "BJ", "BM", "BT", "BO", "BQ", "BA", "BW", "BV", "BR",
+            "IO", "BN", "BG", "BF", "BI", "KH", "CM", "CA", "CV", "KY", "CF", "TD", "CL", "CN", "CX", "CC",
+            "CO", "KM", "CG", "CD", "CK", "CR", "CI", "HR", "CU", "CW", "CY", "CZ", "DK", "DJ", "DM", "DO",
+            "EC", "EG", "SV", "GQ", "ER", "EE", "SZ", "ET", "FK", "FO", "FJ", "FI", "FR", "GF", "PF", "TF",
+            "GA", "GM", "GE", "DE", "GH", "GI", "GR", "GL", "GD", "GP", "GU", "GT", "GG", "GN", "GW", "GY",
+            "HT", "HM", "VA", "HN", "HK", "HU", "IS", "IN", "ID", "IR", "IQ", "IE", "IM", "IL", "IT", "JM",
+            "JP", "JE", "JO", "KZ", "KE", "KI", "KP", "KR", "KW", "KG", "LA", "LV", "LB", "LS", "LR", "LY",
+            "LI", "LT", "LU", "MO", "MG", "MW", "MY", "MV", "ML", "MT", "MH", "MQ", "MR", "MU", "YT", "MX",
+            "FM", "MD", "MC", "MN", "ME", "MS", "MA", "MZ", "MM", "NA", "NR", "NP", "NL", "NC", "NZ", "NI",
+            "NE", "NG", "NU", "NF", "MK", "MP", "NO", "OM", "PK", "PW", "PS", "PA", "PG", "PY", "PE", "PH",
+            "PN", "PL", "PT", "PR", "QA", "RE", "RO", "RU", "RW", "BL", "SH", "KN", "LC", "MF", "PM", "VC",
+            "WS", "SM", "ST", "SA", "SN", "RS", "SC", "SL", "SG", "SX", "SK", "SI", "SB", "SO", "ZA", "GS",
+            "SS", "ES", "LK", "SD", "SR", "SJ", "SE", "CH", "SY", "TW", "TJ", "TZ", "TH", "TL", "TG", "TK",
+            "TO", "TT", "TN", "TR", "TM", "TC", "TV", "UG", "UA", "AE", "GB", "US", "UM", "UY", "UZ", "VU",
+            "VE", "VN", "VG", "VI", "WF", "EH", "YE", "ZM", "ZW"
+        };
+
         private readonly HttpClient _httpClient;
         private readonly IConfiguration _configuration;
         public IpGeolocationService(HttpClient httpClient, IConfiguration configuration)
@@ -13,7 +33,7 @@ namespace BlockedCountries.Services
             _httpClient = httpClient;
             _configuration = configuration;
         }
-        public async Task<CountryInfo> GetCountryInfoByIpAsync(string ipAddress)
+        public async Task<IpGeolocationResponse> GetCountryInfoByIpAsync(string ipAddress)
         {
             var apiKey = _configuration["IpGeolocation:ApiKey"];
             var request =await _httpClient.GetAsync($"https://api.ipgeolocation.io/ipgeo?apiKey={apiKey}&ip={ipAddress}");
@@ -21,18 +41,23 @@ namespace BlockedCountries.Services
             if (request.IsSuccessStatusCode)
             {
                 var response = await request.Content.ReadAsStringAsync();
-                var data = JsonSerializer.Deserialize<JsonDocument>(response);
-                //return data;
-                return new CountryInfo
+
+                var data = JsonConvert.DeserializeObject<IpGeolocationResponse>(response);
+                
+                return new IpGeolocationResponse
                 {
-                    CountryCode = data.RootElement.GetProperty("country_code2").GetString(),
-                    CountryName = data.RootElement.GetProperty("country_name").GetString()
+                    CountryCode = data.CountryCode,
+                    CountryName = data.CountryName
                 };
             }
             else
             {
                 throw new Exception("Error fetching data from IP Geolocation API");
             }
+        }
+        public async Task<bool> IsValidCountryCodeAsync(string countryCode)
+        {
+            return ValidCountryCodes.Contains(countryCode.ToUpper());
         }
     }
 }

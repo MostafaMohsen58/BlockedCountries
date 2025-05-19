@@ -4,6 +4,7 @@ namespace BlockedCountries.Services.Interfaces
 {
     public interface IIpGeolocationService
     {
-        Task<CountryInfo> GetCountryInfoByIpAsync(string ipAddress);
+        Task<IpGeolocationResponse> GetCountryInfoByIpAsync(string ipAddress);
+        Task<bool> IsValidCountryCodeAsync(string countryCode);
     }
 }
