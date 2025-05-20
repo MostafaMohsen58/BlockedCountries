@@ -7,18 +7,11 @@ namespace BlockedCountries.Repositories
     public class CountryBlockingRepository:ICountryBlockingRepository
     {
         private readonly ConcurrentDictionary<string, CountryInfo> _blockedCountries = new();
-        //private readonly ILogger<CountryBlockingService> _logger;
-
-        //public CountryBlockingRepository(ILogger<CountryBlockingService> logger)
-        //{
-        //    _logger = logger;
-        //}
 
         //Add 
-        public async Task<bool> BlockCountryAsync(string countryCode)
+        public async Task<bool> BlockCountryAsync(/*string countryCode*/CountryInfo countryInfo)
         {
-            var countryInfo = new CountryInfo { CountryCode = countryCode.ToUpper() };
-            return _blockedCountries.TryAdd(countryCode.ToUpper(), countryInfo);
+            return _blockedCountries.TryAdd(countryInfo.CountryCode.ToUpper(), countryInfo);
         }
 
         //Remove

@@ -21,25 +21,35 @@ namespace BlockCountries.Tests
         [Fact]
         public async void AddCountry_WithValidCountry_ShouldReturnTrue()
         {
+            CountryInfo countryInfo = new CountryInfo
+            {
+                CountryCode = "GB",
+                CountryName = "United Kingdom"
+            };
             //arrange
-            var countryCode = "GB";
+            //var countryCode = "GB";
 
             //act
-            var result = _countryBlockingRepository.BlockCountryAsync(countryCode).Result;
+            var result = _countryBlockingRepository.BlockCountryAsync(countryInfo).Result;
 
             //assert
             Assert.True(result);
-            Assert.True(await _countryBlockingRepository.IsCountryBlockedAsync(countryCode));
+            Assert.True(await _countryBlockingRepository.IsCountryBlockedAsync(countryInfo.CountryCode));
         }
         [Fact]
         public async Task AddCountry_WithDuplicateCountry_ShouldReturnFalse()
         {
             //arrange
-            var countryCode = "US";
-            await _countryBlockingRepository.BlockCountryAsync(countryCode);
+            CountryInfo countryInfo = new CountryInfo
+            {
+                CountryCode = "GB",
+                CountryName = "United Kingdom"
+            };
+            //var countryCode = "US";
+            await _countryBlockingRepository.BlockCountryAsync(countryInfo);
 
             //act
-            var result = await _countryBlockingRepository.BlockCountryAsync(countryCode);
+            var result = await _countryBlockingRepository.BlockCountryAsync(countryInfo);
 
             //assert
             Assert.False(result);
@@ -49,13 +59,16 @@ namespace BlockCountries.Tests
         public async Task RemoveCountry_WithExistingCountry_ShouldReturnTrue()
         {
             // Arrange
-            var countryCode = "US";
-            await _countryBlockingRepository.BlockCountryAsync(countryCode);
+            CountryInfo countryInfo = new CountryInfo
+            {
+                CountryCode = "US"
+            };
+            await _countryBlockingRepository.BlockCountryAsync(countryInfo);
             // Act
-            var result = await _countryBlockingRepository.UnblockCountryAsync(countryCode);
+            var result = await _countryBlockingRepository.UnblockCountryAsync(countryInfo.CountryCode);
             // Assert
             Assert.True(result);
-            Assert.False(await _countryBlockingRepository.IsCountryBlockedAsync(countryCode));
+            Assert.False(await _countryBlockingRepository.IsCountryBlockedAsync(countryInfo.CountryCode));
         }
 
         [Fact]
@@ -104,6 +117,10 @@ namespace BlockCountries.Tests
         public async Task AddCountry_WithVariousInputs_ShouldValidateCorrectly(string countryCode, bool expectedResult)
         {
             // Arrange
+            CountryInfo countryInfo = new CountryInfo
+            {
+                CountryCode = countryCode
+            };
 
             // Mock the IsValidCountryCodeAsync method to return true for valid country codes
             _ipGeolocationService.Setup(x => x.IsValidCountryCodeAsync(countryCode))
@@ -113,7 +130,7 @@ namespace BlockCountries.Tests
             bool result;
             if (_ipGeolocationService.Object.IsValidCountryCodeAsync(countryCode).Result)
             {
-                result = await _countryBlockingRepository.BlockCountryAsync(countryCode);
+                result = await _countryBlockingRepository.BlockCountryAsync(countryInfo);
             }
             else
             {

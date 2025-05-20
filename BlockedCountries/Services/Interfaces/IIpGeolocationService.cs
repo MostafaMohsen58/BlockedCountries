@@ -6,5 +6,6 @@ namespace BlockedCountries.Services.Interfaces
     {
         Task<IpGeolocationResponse> GetCountryInfoByIpAsync(string ipAddress);
         Task<bool> IsValidCountryCodeAsync(string countryCode);
+        Task<string> GetCountryNameAsync(string countryCode);
     }
 }

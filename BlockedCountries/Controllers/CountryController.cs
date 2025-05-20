@@ -41,7 +41,14 @@ namespace BlockedCountries.Controllers
             if (!await _ipGeolocationService.IsValidCountryCodeAsync(blockCountryDto.CountryCode))
                 return BadRequest("Invalid country code or format");
 
-            var result =await _blockingRepository.BlockCountryAsync(blockCountryDto.CountryCode);
+            var countryInfo = new CountryInfo
+            {
+                CountryCode = blockCountryDto.CountryCode,
+                CountryName = await _ipGeolocationService.GetCountryNameAsync(blockCountryDto.CountryCode)
+            };
+            //var result =await _blockingRepository.BlockCountryAsync(blockCountryDto.CountryCode);
+            var result = await _blockingRepository.BlockCountryAsync(countryInfo);
+
 
             return result ? Ok("Country successfully blocked") : Conflict("Country is already blocked");
         }
@@ -91,7 +98,7 @@ namespace BlockedCountries.Controllers
         /// <returns>200 OK if successful, 400 for invalid input, 409 if already blocked</returns>
         /// <response code="200">Country is temporarily blocked successfully for _ Min</response>
         /// <response code="400">Invalid country code or Duration is wrong</response>
-        /// <response code="409">Country is already temporarily blocked</response>
+        /// <response code="409">Country is already blocked</response>
         [HttpPost("temporal-block")]
         public async Task<IActionResult> TemporarilyBlockCountry([FromBody] TemporalBlockRequest request)
         {
@@ -104,7 +111,7 @@ namespace BlockedCountries.Controllers
                 return BadRequest("Invalid country code");
 
             var result = await _blockingRepository.TemporarilyBlockCountryAsync(request.CountryCode, request.DurationMinutes);
-            return result ? Ok($"Country is temporarily blocked successfully for {request.DurationMinutes} Min") : Conflict("Country is already temporarily blocked");
+            return result ? Ok($"Country is blocked successfully for {request.DurationMinutes} Min") : Conflict("Country is already temporarily blocked");
         }
     }
 }
