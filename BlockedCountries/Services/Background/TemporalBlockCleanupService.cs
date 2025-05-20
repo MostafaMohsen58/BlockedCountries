@@ -24,7 +24,7 @@ namespace BlockedCountries.Services.Background
 
                     foreach (var country in allCountriesBlocked.Items)
                     {
-                        if(country.IsTemporarilyBlocked)
+                        if(!country.IsTemporarilyBlocked && country.BlockedUntil !=null)
                         {
                             await _blockingRepository.UnblockCountryAsync(country.CountryCode);
                             _logger.LogInformation($"Unblocked expired for country: {country.CountryCode}");

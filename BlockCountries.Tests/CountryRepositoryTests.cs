@@ -21,13 +21,12 @@ namespace BlockCountries.Tests
         [Fact]
         public async void AddCountry_WithValidCountry_ShouldReturnTrue()
         {
+            //arrange
             CountryInfo countryInfo = new CountryInfo
             {
                 CountryCode = "GB",
                 CountryName = "United Kingdom"
             };
-            //arrange
-            //var countryCode = "GB";
 
             //act
             var result = _countryBlockingRepository.BlockCountryAsync(countryInfo).Result;
@@ -45,7 +44,7 @@ namespace BlockCountries.Tests
                 CountryCode = "GB",
                 CountryName = "United Kingdom"
             };
-            //var countryCode = "US";
+
             await _countryBlockingRepository.BlockCountryAsync(countryInfo);
 
             //act
@@ -64,8 +63,10 @@ namespace BlockCountries.Tests
                 CountryCode = "US"
             };
             await _countryBlockingRepository.BlockCountryAsync(countryInfo);
+
             // Act
             var result = await _countryBlockingRepository.UnblockCountryAsync(countryInfo.CountryCode);
+
             // Assert
             Assert.True(result);
             Assert.False(await _countryBlockingRepository.IsCountryBlockedAsync(countryInfo.CountryCode));
@@ -86,9 +87,12 @@ namespace BlockCountries.Tests
         {
             // Arrange
             var countryCode = "US";
+            var countryName = "United States";
             var durationMinutes = 60;
+
             // Act
-            var result = await _countryBlockingRepository.TemporarilyBlockCountryAsync(countryCode, durationMinutes);
+            var result = await _countryBlockingRepository.TemporarilyBlockCountryAsync(countryCode, countryName, durationMinutes);
+
             // Assert
             Assert.True(result);
             Assert.True(await _countryBlockingRepository.IsCountryBlockedAsync(countryCode));
@@ -100,7 +104,7 @@ namespace BlockCountries.Tests
         public async Task IsCountryBlocked_WithExpiredTemporaryBlock_ShouldReturnFalse()
         {
             // Arrange
-            await _countryBlockingRepository.TemporarilyBlockCountryAsync("US", 0); // Immediate expiration
+            await _countryBlockingRepository.TemporarilyBlockCountryAsync("US", "United States", 0); // Immediate expiration
 
             // Act
             var result = await _countryBlockingRepository.IsCountryBlockedAsync("US");
