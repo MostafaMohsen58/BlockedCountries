@@ -21,11 +21,12 @@ namespace BlockedCountries.Repositories
         }
 
         //Add country to block list with expiration time
-        public async Task<bool> TemporarilyBlockCountryAsync(string countryCode, int durationMinutes)
+        public async Task<bool> TemporarilyBlockCountryAsync(string countryCode,string countryName, int durationMinutes)
         {
             var countryInfo = new CountryInfo
             {
                 CountryCode = countryCode.ToUpper(),
+                CountryName= countryName,
                 BlockedUntil = DateTime.UtcNow.AddMinutes(durationMinutes)
             };
 

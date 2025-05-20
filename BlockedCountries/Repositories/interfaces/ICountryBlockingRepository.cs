@@ -6,7 +6,7 @@ namespace BlockedCountries.Repositories.interfaces
     {
         Task<bool> BlockCountryAsync(/*string countryCode*/CountryInfo countryInfo);
         Task<bool> UnblockCountryAsync(string countryCode);
-        Task<bool> TemporarilyBlockCountryAsync(string countryCode, int durationMinutes);
+        Task<bool> TemporarilyBlockCountryAsync(string countryCode,string countryName, int durationMinutes);
         Task<PaginatedResponse<CountryInfo>> GetBlockedCountriesAsync(int page, int pageSize, string searchTerm = null);
         Task<bool> IsCountryBlockedAsync(string countryCode);
     }

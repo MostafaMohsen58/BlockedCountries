@@ -110,7 +110,10 @@ namespace BlockedCountries.Controllers
             if(!await _ipGeolocationService.IsValidCountryCodeAsync(request.CountryCode))
                 return BadRequest("Invalid country code");
 
-            var result = await _blockingRepository.TemporarilyBlockCountryAsync(request.CountryCode, request.DurationMinutes);
+
+            var countryName = await _ipGeolocationService.GetCountryNameAsync(request.CountryCode);
+
+            var result = await _blockingRepository.TemporarilyBlockCountryAsync(request.CountryCode, countryName, request.DurationMinutes);
             return result ? Ok($"Country is blocked successfully for {request.DurationMinutes} Min") : Conflict("Country is already temporarily blocked");
         }
     }
