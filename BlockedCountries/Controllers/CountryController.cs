@@ -31,7 +31,7 @@ namespace BlockedCountries.Controllers
 
             var result =await _blockingRepository.BlockCountryAsync(blockCountryDto.CountryCode);
 
-            return result ? Ok() : Conflict("Country is already blocked");
+            return result ? Ok("Country successfully blocked") : Conflict("Country is already blocked");
         }
 
         [HttpDelete("block/{countryCode}")]

@@ -19,7 +19,6 @@ namespace BlockedCountries
             // Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
             builder.Services.AddOpenApi();
 
-
             //register my services
             builder.Services.AddHttpClient<IIpGeolocationService, IpGeolocationService>();
             builder.Services.AddSingleton<ICountryBlockingRepository, CountryBlockingRepository>();
@@ -35,8 +34,12 @@ namespace BlockedCountries
             // Configure the HTTP request pipeline.
             //if (app.Environment.IsDevelopment())
             //{
-                app.MapOpenApi();
-                app.UseSwaggerUI(op => op.SwaggerEndpoint("/openapi/v1.json", "v1"));
+            app.MapOpenApi();
+            app.UseSwaggerUI(op =>
+            {
+                op.SwaggerEndpoint("/openapi/v1.json", "Country Blocking API v1");
+            });
+
             //}
 
             app.UseHttpsRedirection();
