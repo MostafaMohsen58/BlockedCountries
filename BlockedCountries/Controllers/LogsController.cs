@@ -5,6 +5,9 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace BlockedCountries.Controllers
 {
+    /// <summary>
+    /// Controller for managing access logs and blocked attempt records
+    /// </summary>
     [Route("api/[controller]")]
     [ApiController]
     public class LogsController : ControllerBase
@@ -14,6 +17,14 @@ namespace BlockedCountries.Controllers
         {
             _attemptsLogger = attemptsLogger;
         }
+
+        /// <summary>
+        /// Retrieves a paginated list of blocked access attempts
+        /// </summary>
+        /// <param name="page">The page number </param>
+        /// <param name="pageSize">Number of items per page </param>
+        /// <returns>A paginated list of blocked access attempts</returns>
+        /// <response code="200">Returns the list of blocked attempts</response>
         [HttpGet("blocked-attempts")]
         public async Task<ActionResult<PaginatedResponse<BlockedAttemptLog>>> GetLogs(
             [FromQuery] int page = 1,

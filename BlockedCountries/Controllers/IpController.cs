@@ -7,6 +7,9 @@ using System.Net;
 
 namespace BlockedCountries.Controllers
 {
+    /// <summary>
+    /// Controller for managing IP address operations and geolocation checks
+    /// </summary>
     [Route("api/[controller]")]
     [ApiController]
     public class IpController : ControllerBase
@@ -21,6 +24,14 @@ namespace BlockedCountries.Controllers
             _blockingRepository = blockingRepository;
             _attemptsLogger = attemptsLogger;
         }
+        /// <summary>
+        /// Looks up the country information for a given IP address
+        /// </summary>
+        /// <param name="ipAddress">The IP address to look up</param>
+        /// <returns>Country information for the IP address</returns>
+        /// <response code="200">Returns the country information for the IP</response>
+        /// <response code="400">Invalid IP address format</response>
+        /// <response code="500">Internal server error</response>
         [HttpGet("lookup")]
         public async Task<ActionResult<CountryInfo>> lookupIp([FromQuery] string ipAddress=null)
         {
@@ -33,10 +44,6 @@ namespace BlockedCountries.Controllers
             try
             {
                 var countryInfo =await _ipGeolocationService.GetCountryInfoByIpAsync(ipAddress);
-                if (countryInfo == null)
-                {
-                    return NotFound("IP address not found.");
-                }
                 return Ok(countryInfo);
             }
             catch (Exception ex)
@@ -59,6 +66,13 @@ namespace BlockedCountries.Controllers
         {
             return IPAddress.TryParse(ipAddress, out _);
         }
+
+        /// <summary>
+        /// Checks if an IP address is from a blocked country
+        /// </summary>
+        /// <returns>Returns an object containing IsBlocked (boolean) and CountryCode (string) properties</returns>
+        /// <response code="200">Returns an object with block status and country code</response>
+        /// <response code="500">Internal server error</response>
         [HttpGet("check-block")]
         public async Task<IActionResult> CheckBlock()
         {
@@ -79,11 +93,11 @@ namespace BlockedCountries.Controllers
                     UserAgent = userAgent
                 });
 
-                return Ok(new { IsBlocked = isBlocked, CountryCode = countryInfo.CountryCode });
+                return Ok(new BlockCheckResponse { IsBlocked = isBlocked, CountryCode = countryInfo.CountryCode });
             }
             catch (Exception ex)
             {
-                return StatusCode(500, "Error checking block status");
+                return StatusCode(500, "Internal server error");
             }
         }
     }
